@@ -1,0 +1,124 @@
+<apex:page showHeader="false" sidebar="false"
+    standardController="Account" extensions="AccountController">
+    <script type="text/javascript">
+function toggleDisplay(firstelement,secondelement){
+     var firstDiv = document.getElementById(firstelement);
+     var secondDiv = document.getElementById(secondelement);
+     firstDiv.style.display="none";
+     secondDiv.style.display="block";
+     var saveDiv = document.getElementById('saveDiv');
+     saveDiv.style.display="block";
+}
+
+function callCancel(){
+    toggleDisplay('FieldEdit1','Field1');
+    toggleDisplay('FieldEdit2','Field2');
+    toggleDisplay('FieldEdit3','Field3');
+    toggleDisplay('FieldEdit4','Field4');
+    toggleDisplay('FieldEdit5','Field5');
+    var saveDiv = document.getElementById('saveDiv');
+     saveDiv.style.display="none";
+}
+
+</script>
+
+    <apex:stylesheet value="{!$Resource.CustomStylesBW}" />
+
+    <!--<apex:pageBlock >
+<apex:pageBlockSection columns="1" collapsible="false"> -->
+    <apex:outputPanel id="wrappingPanel">
+        <apex:outputPanel id="panel1" rendered="{!(displayPhone==true)&&(firstContactMade==true)}">
+            <apex:form id="MainForm">
+                <div class="pbSubsection">
+                    <table class="detailList" cellspacing="0" cellpadding="0" border="0">
+                        <tbody>
+                            <tr>
+                                  <td class="labelTextCustom">Home Phone</td>
+                                <td class="dataTextTdcustom">
+                                    <div id="Field1">
+                                     <span class="dataTextSpanCustom"> <apex:outputText value="{!account.Phone}" /> </span> <span
+                                            class="editButtonSpanCustom"> <apex:commandLink onclick="toggleDisplay('Field1','FieldEdit1');return false;">
+                                                <apex:image value="{!$Resource.PencilEdit}" width="12"
+                                                    height="12" />
+                                            </apex:commandLink> </span>
+                                    </div>
+                                    <div id="FieldEdit1" style="display: none">
+                                        <apex:inputField value="{!account.Phone}"
+                                            styleClass="inputFieldCustom" />
+                                    </div></td>
+                            </tr>
+                           
+                            <tr>
+                                <td class="labelTextCustom">Mobile Phone</td>
+                                <td class="dataTextTdcustom">
+                                    <div id="Field3">
+                                        <span class="dataTextSpanCustom"> <apex:outputText value="{!account.PersonMobilePhone}" /> </span> <span
+                                            class="editButtonSpanCustom"> <apex:commandLink onclick="toggleDisplay('Field3','FieldEdit3');return false;">
+                                                <apex:image value="{!$Resource.PencilEdit}" width="12"
+                                                    height="12" />
+                                            </apex:commandLink> </span>
+                                    </div>
+                                    <div id="FieldEdit3" style="display: none">
+                                        <apex:inputField value="{!account.PersonMobilePhone}"
+                                            styleClass="inputFieldCustom" />
+                                    </div></td>
+                                    
+                               <td class="labelTextCustom" style="border-bottom-width: 0px;">&nbsp;</td>
+                               <td class="dataTextTdcustom" style="border-bottom-width: 0px; padding-top: 13px;">
+                                <div id="saveDiv" style="display: none">
+                                    <apex:commandButton action="{!doSave}" value="Save"
+                                        onclick="toggleDisplay('FieldEdit1','Field1');" />
+                                      &nbsp;&nbsp;&nbsp;
+                                    <button onclick="callCancel(); return false;">Cancel</button>
+                                </div></td>
+                                    
+                            </tr>
+                            <tr>
+                                <td class="labelTextCustom">Alternate Phone</td>
+                                <td class="dataTextTdcustom">
+                                    <div id="Field5">
+                                        <span class="dataTextSpanCustom"> <apex:outputText value="{!account.Alternate_Phone__c}" /> </span> <span
+                                            class="editButtonSpanCustom"> <apex:commandLink onclick="toggleDisplay('Field5','FieldEdit5');return false;">
+                                                <apex:image value="{!$Resource.PencilEdit}" width="12"
+                                                    height="12" />
+                                            </apex:commandLink> </span>
+                                    </div>
+                                    <div id="FieldEdit5" style="display: none">
+                                        <apex:inputField value="{!account.Alternate_Phone__c}"
+                                            styleClass="inputFieldCustom" />
+                                    </div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!---<table class="detailList" cellspacing="0" cellpadding="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="labelTextCustom" style="border-bottom-width: 0px;">&nbsp;</td>
+                            <td class="dataTextTdcustom"
+                                style="border-bottom-width: 0px; padding-top: 13px;">
+                                <div id="saveDiv" style="display: none">
+                                    <apex:commandButton action="{!doSave}" value="Save"
+                                        onclick="toggleDisplay('FieldEdit1','Field1');" />
+                                    &nbsp;&nbsp;&nbsp;
+                                    <button onclick="callCancel(); return false;">Cancel</button>
+                                </div></td>
+                        </tr>
+                    </tbody>
+                </table>--->
+            </apex:form>
+        </apex:outputPanel>
+        <apex:outputPanel id="panel2" rendered="{!(displayPhone==false)&&(firstContactMade==true)}">
+        Phone unavailable due to time zone restrictions.
+        </apex:outputPanel>
+    </apex:outputPanel>
+    <apex:outputPanel id="wrappingPanelForButton">
+        <apex:outputPanel rendered="{!firstContactMade==false}">
+            <apex:form >
+            <apex:commandButton action="{!updateFirstContact}" id="button_update" reRender="wrappingPanel,wrappingPanelForButton" value="Show Phone Number" />
+            </apex:form>
+        </apex:outputPanel>
+    </apex:outputPanel>
+    <!--</apex:pageBlockSection>
+</apex:pageBlock>-->
+</apex:page>

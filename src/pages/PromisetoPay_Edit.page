@@ -1,0 +1,63 @@
+<apex:page standardcontroller="Promise_to_Pay__c">
+
+<style type="text/css">
+    .col1 {width:200px; text-align:center;}
+    .col2 {width:200px; text-align:center;}
+    .col3 {width:800px; text-align:center;}        
+</style>
+
+<apex:form >
+        <apex:pageBlock title="Edit Promise to Pay">
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="2">
+
+                <apex:panelGrid columns="3" columnClasses="col1, col2, col3" cellpadding="10" cellspacing="10">
+                <apex:outputText value="Payment Date" style="font-weight: bold"/>
+                <apex:outputText value="Payment Amount" style="font-weight: bold"/>
+                <apex:outputText value="Comments" style="font-weight: bold"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_1_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_1_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_1_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_2_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_2_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_2_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_3_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_3_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_3_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_4_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_4_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_4_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_5_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_5_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_5_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_6_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_6_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_6_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_7_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_7_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_7_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_8_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_8_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_8_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_9_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_9_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_9_Comment__c}" style="width: 255px !important;" />
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_10_Date__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_10_Amt__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Pymt_10_Comment__c}" style="width: 255px !important;" />                    
+                                    </apex:panelGrid>
+
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="2" title="Inactive Indicators">
+                    <apex:inputField value="{!Promise_to_Pay__c.Inactive__c}"/>
+                    <apex:inputField value="{!Promise_to_Pay__c.Inactive_Reason__c}" style="width: 255px !important;" />            
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

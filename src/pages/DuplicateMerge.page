@@ -1,0 +1,116 @@
+<apex:page standardController="Lead" extensions="DuplicateMergeController" >
+
+<link type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" 
+
+rel="stylesheet"/>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js">
+    </script>   
+
+<script type="text/javascript">
+    var j = jQuery.noConflict();
+    j(function() {
+            j("#dialog").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: { "Ok": function() { 
+                                         // use me instead of this, as this now refers to the function.
+                                         //this.close();
+                                         j(this).dialog('close');
+                         }}
+            });
+        });
+</script>
+
+<script type="text/javascript">
+  function doMerge(leadId){
+    var checkedArray = new Array();
+    var checkedValue = '';
+    var cboxes = document.getElementsByName('list[]');
+    var len = cboxes.length;
+    for (var i=0; i<len; i++) {
+        //alert(i + (cboxes[i].checked?' checked ':' unchecked ') + cboxes[i].value);
+        if(cboxes[i].checked){
+          checkedArray.push(cboxes[i].value);  
+        }
+    }
+    
+
+    if(checkedArray.length>0){
+      if(checkedArray.length>2){
+          alert('Maximum number of records selected to merge cannot be more than 2 at a time');
+      }
+       //var checkedValue = checkedArray.join(',');
+       //alert (checkedArray);
+       //alert (leadId);
+
+       DuplicateMergeController.doMerge(checkedArray,leadId, function(result, event){
+              alert(result);
+              if(result){
+                window.location.href='/'+leadId;
+              }else{
+                alert('Lead merge Failed. Contact System administrator');
+              }
+              
+            });
+    }else{
+             alert('Nothing selected');
+    }
+  }
+</script>
+    <apex:form id="form1" style="none">
+    <apex:outputPanel rendered="{!checkSize}"> <b><i> NO DUPLICATES FOUND !</i> </b> </apex:outputPanel>
+    <apex:outputPanel rendered="{!checkSize=false}" > 
+       
+
+    <apex:pageBlock title="LEAD DETAILS" >
+        <apex:pageBlockSection >
+            
+            <apex:outputField value="{!lead.Name}" id="name" /> <br/><br/>
+            <apex:outputField value="{!lead.lastName}" id="lname" /><br/><br/>
+            <apex:outputField value="{!lead.COMPANY}" id="co" /><br/><br/>
+            <apex:outputField value="{!lead.email}" id="email" /><br/><br/>
+            <apex:outputField value="{!lead.phone}" id="ph" /><br/><br/>
+     </apex:pageBlockSection>  
+          
+    </apex:pageBlock> <br/>
+    <apex:outputPanel rendered="{!matches.size=0}"> <br/><b><i> NO DUPLICATES FOUND !</i> </b> </apex:outputPanel>
+   <apex:outputPanel rendered="{!matches.size>0}">
+    <apex:pageBlock Title="DUPLICATES" >
+      
+      <table border="2px" style="width:700px" height="100px" >
+        <tr>
+
+              <th>Select</th>
+              <th>Name</th>
+              <th>ID</th>
+              <th>Merged</th>
+              <th>Merged By</th>
+              <th>Merged Date</th>
+       </tr>
+
+       <apex:repeat value="{!matches}" var="match" id="theRepeat">
+       <tr>
+          <td>
+           <apex:outputPanel rendered="{!match.Is_Merged__c==false}">
+           <input type="checkbox" name="list[]" value="{!match.Matched_Lead__c}"/>
+           </apex:outputPanel> 
+           <apex:outputPanel rendered="{!match.Is_Merged__c==true}">
+          
+           </apex:outputPanel> 
+          </td>
+                     <td>{!match.Name}</td>
+                     <td>{!match.Id}</td>
+                     <td>{!match.Is_Merged__c}</td>
+                     <td>{!match.Merged_By__r.Name}</td>
+                     <td>{!match.Merged_Date_Time__c}</td>
+                   </tr>
+              </apex:repeat> 
+      
+ </table> <br/>
+ <apex:commandButton onclick="doMerge('{!lead.Id}'); return false;" value="Merge"/>  
+     </apex:pageBlock>  
+     </apex:outputPanel>
+    </apex:outputPanel> 
+  </apex:form>          
+</apex:page>

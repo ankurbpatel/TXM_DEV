@@ -1,0 +1,10 @@
+<apex:page standardController="opportunity" showHeader="true" tabStyle="opportunity">
+        <script>         
+         function refreshopportunity() 
+         {       
+             window.parent.location.href='/{!opportunity.id}';         
+         }           
+
+    </script>
+    <apex:detail relatedList="true" title="true"/>
+</apex:page>

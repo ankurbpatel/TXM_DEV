@@ -1,0 +1,27 @@
+<apex:page standardController="Lead" sidebar="False" showHeader="False" extensions="closedTasksController">
+   
+     <apex:pageBlock >
+
+        <apex:pageBlockTable value="{!TaskList}" var="item" >
+
+            <apex:column value="{!item.Subject__c}"/>
+
+            <apex:column value="{!item.Due__c}"/>
+            
+            <apex:column value="{!item.Description}"/>
+            
+            <apex:column headerValue="Last Modified By">
+                
+                <apex:outputtext value="{!item.Owner.name}"/>
+                
+            </apex:column>
+            
+            <apex:column value="{!item.LastModifiedDate}" />
+            
+             <apex:column value="{!item.Attempt__c}"/>
+             
+        </apex:pageBlockTable>
+
+    </apex:pageBlock>
+   
+   </apex:page>

@@ -1,0 +1,206 @@
+<apex:page standardController="Lead" extensions="UpdateLeadInfo" action="{!executeAction}"> 
+ 
+    <apex:form >
+    
+        <apex:sectionHeader title="Lead Edit" subtitle="{!if(Lead.Id==null,'New Lead',Lead.Name)}" />   
+            
+            <apex:pageBlock title="Lead Edit" mode="edit">
+                 <apex:pageBlockButtons >
+                     <apex:commandButton action="{!Save}" value="Save" />  
+                     <apex:commandButton action="{!Cancel}" value="Cancel" />                                                                                            
+                 </apex:pageBlockButtons>
+            
+                 <apex:pagemessages /> 
+            
+                <apex:pageblocksection columns="2" title="Lead Information"> 
+                    <apex:outputfield value="{!Lead.OwnerID}"/>                
+                    <apex:inputfield value="{!Lead.Status}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Lead.Status}" rendered="{!$Profile.Name !='System Administrator'}" />                    
+                    <apex:inputfield value="{!Lead.Lead_Id_custom__c}"/>  
+                    <apex:inputfield value="{!Lead.StatusDetails__c}" rendered="{!$Profile.Name =='System Administrator'}"/>                  
+                    <apex:outputfield value="{!Lead.StatusDetails__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:outputtext value=""/>                        
+                    <apex:inputCheckbox value="{!Lead.Exclude_From_Bonus__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                </apex:pageblockSection>     
+                      
+                <apex:pageblockSection columns="2" Title="Customer Information">                                   
+                    <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="{!$ObjectType.Lead.Fields.FirstName.label}"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Lead.Salutation}"/>
+                                <apex:inputfield value="{!Lead.FirstName}"/> 
+                            </apex:outputpanel> 
+                    </apex:pageblocksectionitem> 
+                    
+                    <apex:inputfield value="{!Lead.Street}" style="width: 150px"/>
+                    <apex:inputfield value="{!Lead.LastName}" style="width: 225px"/>
+                    <apex:inputfield value="{!Lead.City}"/>
+                    <apex:inputfield value="{!Lead.Email}"/>
+                    <apex:inputfield value="{!Lead.State}"/>
+                    <apex:inputfield value="{!Lead.Best_time_to_call__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Lead.PostalCode}"/>
+                    <apex:outputtext value=""/>
+                    <apex:inputfield value="{!Lead.Country}"/>                    
+                 </apex:pageblockSection>       
+                 
+                 <apex:pageblocksection columns="2" title="Phone - Admin Info" rendered="{!$Profile.Name =='System Administrator'}" > 
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Phone_Admin_Page_Section}" var="f">
+                        <apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                     
+                 </apex:pageblockSection>                    
+                              
+                 <apex:pageblocksection columns="2" title="Product Request"> 
+                    <apex:inputfield value="{!Lead.LeadSource}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Lead.LeadSource}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Lead.Product_Requested__c}"/> 
+                    <apex:inputfield value="{!Lead.Lead_Channel__c}"/>
+                    <apex:inputfield value="{!Lead.Cash_Needed__c}"/>
+                    <apex:inputfield value="{!Lead.Brand_Requested__c}"/>          
+                 </apex:pageblockSection>
+                                
+                 <apex:actionRegion >               
+                 <apex:pageBlockSection columns="2" title="Qualification" id="vehicleinfo">                                                     
+                      <apex:pageblocksectionitem >                     
+                        <apex:outputlabel value="Vehicle Year" style="{!if(Lead.Store_Agent_Profile_Name__c=='TMX Store Agent' && Lead.Product_Requested__c=='Title','color:red','')}" />                                                
+                            <apex:outputpanel >                             
+                                <apex:inputfield value="{!Lead.Vehicle_Year_BB__c}">  
+                                    <apex:actionSupport event="onchange" rerender="vehicleinfo"/> 
+                                </apex:inputfield>                                                                 
+                                <apex:inputfield value="{!Lead.Vehicle_Year__c}" rendered="{!Lead.Vehicle_Year_BB__c =='--Other--'}"/>                                 
+                            </apex:outputpanel>                                                       
+                       </apex:pageblocksectionitem>               
+                                                                                 
+                     <apex:inputfield value="{!Lead.Car_Title_Satus__c}"/>  
+                     
+                     <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Vehicle Make" style="{!if(Lead.Store_Agent_Profile_Name__c=='TMX Store Agent' && Lead.Product_Requested__c=='Title','color:red','')}"/>                                                   
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Lead.Vehicle_Make_BB__c}"> 
+                                    <apex:actionSupport event="onchange" rerender="vehicleinfo"/>                                
+                                </apex:inputfield>                                    
+                                <apex:inputfield value="{!Lead.Vehicle_Make__c}" rendered="{!Lead.Vehicle_Year_BB__c =='--Other--'}"/> 
+                                <apex:inputfield value="{!Lead.Vehicle_Make__c}" rendered="{!Lead.Vehicle_Make_BB__c =='--Other--'}"/>                                 
+                            </apex:outputpanel>                      
+                     </apex:pageblocksectionitem>                       
+                     
+                     <apex:inputfield value="{!Lead.Car_Title_in_Hand__c}"/>
+                     
+                     <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Vehicle Model" style="{!if(Lead.Store_Agent_Profile_Name__c=='TMX Store Agent' && Lead.Product_Requested__c=='Title','color:red','')}"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Lead.Vehicle_Model_BB__c}">    
+                                    <apex:actionSupport event="onchange" rerender="vehicleinfo"/>                                
+                                </apex:inputfield>                                                             
+                                <apex:inputfield value="{!Lead.Vehicle_Model__c}" rendered="{!Lead.Vehicle_Year_BB__c =='--Other--'}"/>
+                                <apex:inputfield value="{!Lead.Vehicle_Model__c}" rendered="{!Lead.Vehicle_Make_BB__c =='--Other--'}"/>
+                                <apex:inputfield value="{!Lead.Vehicle_Model__c}" rendered="{!Lead.Vehicle_Model_BB__c =='--Other--'}"/> 
+                            </apex:outputpanel> 
+                     </apex:pageblocksectionitem>
+                     
+                     <apex:inputfield value="{!Lead.Making_Payments__c}"/>                                                                                                          
+                     <apex:inputfield value="{!Lead.Vehicle_Mileage__c}"/> 
+                     <apex:outputtext value="" rendered="{!$Profile.Name =='System Administrator'}"/>                    
+                     <apex:inputfield value="{!Lead.How_Many_Payments_Made__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                     
+                     <apex:inputfield value="{!Lead.Estimate__c}"/>                                         
+                     <apex:inputfield value="{!Lead.Credit_Score__c}"/>                                                         
+                </apex:pageblocksection>                          
+                </apex:actionRegion>                          
+                 
+                <apex:pageblocksection columns="2" title="Product Options"> 
+                    <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Title Result" style="{!if(Lead.Store_Agent_Profile_Name__c=='TMX Store Agent' && Lead.Product_Requested__c=='Title','color:red','')}"/>                    
+                        <apex:outputpanel > 
+                             <apex:inputfield value="{!Lead.Title_Result__c}"/>                                 
+                        </apex:outputpanel> 
+                    </apex:pageblocksectionitem>                
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Prod_Opt_Page_Section}" var="f">
+                        <apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                                       
+                 </apex:pageblockSection>    
+                  
+                 <apex:pageblocksection columns="2" title="Appointment"> 
+                    <apex:inputfield value="{!Lead.Store_Name__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Lead.Store_Name__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Appointment Date/Time" style="{!if(Lead.Store_Agent_Profile_Name__c=='TMX Store Agent' && Lead.Product_Requested__c=='Title','color:red','')}"/>                    
+                        <apex:outputpanel > 
+                             <apex:inputfield value="{!Lead.Appointment_Date_Time__c}"/>                                 
+                        </apex:outputpanel> 
+                    </apex:pageblocksectionitem>  
+                    <apex:inputfield value="{!Lead.Store_ID__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Lead.Store_ID__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Lead.Appointment_Email_Sent__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Lead.Appointment_Email_Sent__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Lead.Store_Email__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Lead.Store_Email__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputCheckbox value="{!Lead.VA_acknowledged__c}" rendered="{!$Profile.Name =='System Administrator'}"/>   
+                    <apex:inputfield value="{!Lead.Address__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/>  
+                    <apex:outputfield value="{!Lead.Address__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                
+                 </apex:pageblockSection>   
+                  
+                 <apex:pageblocksection columns="2" title="Related Persons">
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Related_Pers_Page_Section}" var="f">
+                        <apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                       
+                 </apex:pageblockSection> 
+                  
+                 <apex:pageblocksection columns="2" title="Additional Information"> 
+                    <apex:inputCheckbox value="{!Lead.First_Contact_Made__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Lead.Total_Contact_Attempts__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Lead.Last_Disposition__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:inputfield value="{!Lead.Reassigned_to_Recovery__c}" rendered="{!$Profile.Name !='System Administrator'}"/> 
+                    <apex:inputfield value="{!Lead.First_Contact_Attempt__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Lead.First_Contact_Attempt_By__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Lead.Last_Detail__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/>  
+                    <apex:outputtext value="" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Lead.First_Contact_Attempt__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                  
+                    <apex:inputfield value="{!Lead.Total_Contact_Attempts__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/> 
+                    <apex:outputfield value="{!Lead.Last_Disposition__c}" rendered="{!$Profile.Name !='System Administrator'}"/>
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/> 
+                    <apex:outputfield value="{!Lead.Last_Detail__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                   
+                 </apex:pageblockSection>          
+
+                 <apex:pageblocksection columns="2" title="Assignment Fields" rendered="{!$Profile.Name =='System Administrator'}">              
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Assign_Fields_Page_Section}" var="f">
+                        <apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                                      
+                 </apex:pageblockSection>   
+                 
+                 <apex:pageblocksection columns="2" title="Hidden Fields (Web to Lead)" rendered="{!$Profile.Name =='System Administrator'}"> 
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Web_to_Lead_Page_Section}" var="f">
+                        <apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                                                    
+                 </apex:pageblockSection> 
+                
+                 <apex:pageblocksection columns="2" title="Duplicate Flag">            
+                    <apex:pageBlockSectionItem helpText="{!$ObjectType.Lead.Fields.Possible_Duplicate__c.inlineHelpText}" > 
+                        <apex:outputlabel value="Possible Duplicate"/>                      
+                        <apex:outputPanel >
+                            <apex:inputCheckbox value="{!Lead.Possible_Duplicate__c}"/>                            
+                        </apex:outputPanel> 
+                    </apex:pageBlockSectionItem>         
+        
+                    <apex:inputfield value="{!Lead.Duplicate_Details__c}" style="width: 225px"/>  
+                 </apex:pageblockSection> 
+                 
+                 <apex:pageblocksection columns="1" title="Description Information"> 
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Desc_Info_Page_Section}" var="f">
+                        <apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                    
+                 </apex:pageblockSection> 
+                  
+                 <apex:pageblocksection columns="2" title="System Information" rendered="{!$Profile.Name =='System Administrator'}"> 
+                    <apex:repeat value="{!$ObjectType.Lead.FieldSets.Sys_Info_Page_Section}" var="f">
+                        <br/><apex:inputField value="{!Lead[f]}" />
+                    </apex:repeat>                                       
+                 </apex:pageblockSection>   
+                                   
+            </apex:pageBlock>  
+                    
+    </apex:form> 
+
+</apex:page>

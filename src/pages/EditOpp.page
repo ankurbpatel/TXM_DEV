@@ -1,0 +1,187 @@
+<apex:page standardController="Opportunity" extensions="UpdateLoanInfo" action="{!executeAction}" > 
+ 
+    <apex:form >
+    
+        <apex:sectionHeader title="Loan Edit" subtitle="{!if(Opportunity.Id==null,'New Loan',Opportunity.Name)}" />   
+            
+            <apex:pageBlock title="Loan Edit" mode="edit">
+                <apex:pageBlockButtons >
+                     <apex:commandButton action="{!Save}" value="Save" />  
+                     <apex:commandButton action="{!Cancel}" value="Cancel" />                                                                                            
+                </apex:pageBlockButtons>
+                 
+                <apex:pagemessages />
+            
+                <apex:pageblocksection columns="2" title="Loan Information"> 
+                    <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Loan Name"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Opportunity.Name}"/>
+                            </apex:outputpanel> 
+                    </apex:pageblocksectionitem>                 
+                    <apex:inputfield value="{!Opportunity.Lead_Id__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.Lead_Id__c}" rendered="{!$Profile.Name !='System Administrator'}"/>              
+                    <apex:outputfield value="{!Opportunity.OwnerID}"/>  
+                    <apex:inputfield value="{!Opportunity.StageName}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.StageName}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Customer Name"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Opportunity.AccountId}" required="true"/>
+                            </apex:outputpanel> 
+                    </apex:pageblocksectionitem> 
+                    <apex:inputfield value="{!Opportunity.StageNameDetails__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.StageNameDetails__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                                         
+                    <apex:inputCheckbox value="{!Opportunity.Exclude_from_Bonus__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.Custom_Zipcode__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Unique_Loan_Id__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputText value="" rendered="{!$Profile.Name !='System Administrator'}"/>  
+                    <apex:pageblocksectionitem rendered="{!$Profile.Name !='System Administrator'}"> 
+                        <apex:outputlabel value="Manager Email"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Opportunity.Owner_Manager__c}"/>
+                            </apex:outputpanel> 
+                    </apex:pageblocksectionitem>                 
+                 </apex:pageblockSection>                        
+                              
+                 <apex:pageblocksection columns="2" title="Product Request"> 
+                    <apex:inputfield value="{!Opportunity.LeadSource}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.LeadSource}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Requested_Product__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.Requested_Product__c}" rendered="{!$Profile.Name !='System Administrator'}"/> 
+                    <apex:inputfield value="{!Opportunity.Lead_Channel__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.Lead_Channel__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Cash_Needed__c}"/>
+                    <apex:inputfield value="{!Opportunity.Brand__c}"/>                        
+                 </apex:pageblockSection>
+                 
+                 <apex:actionRegion >             
+                 <apex:pageBlockSection columns="2" title="Qualification" id="vehicleinfo">                 
+                     <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Vehicle Year"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Opportunity.Vehicle_Year_BB__c}"> 
+                                    <apex:actionSupport event="onchange" rerender="vehicleinfo"/> 
+                                </apex:inputfield>                                  
+                                <apex:inputfield value="{!Opportunity.Vehicle_Year__c}" rendered="{!Opportunity.Vehicle_Year_BB__c =='--Other--'}"/> 
+                            </apex:outputpanel> 
+                       </apex:pageblocksectionitem>                                          
+                                                  
+                     <apex:inputfield value="{!Opportunity.Car_Title_Status__c}"/>  
+                      
+                     <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Vehicle Make"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Opportunity.Vehicle_Make_BB__c}"> 
+                                    <apex:actionSupport event="onchange" rerender="vehicleinfo"/>                                
+                                </apex:inputfield>                                 
+                                <apex:inputfield value="{!Opportunity.Vehicle_Make__c}" rendered="{!Opportunity.Vehicle_Year_BB__c =='--Other--'}"/> 
+                                <apex:inputfield value="{!Opportunity.Vehicle_Make__c}" rendered="{!Opportunity.Vehicle_Make_BB__c =='--Other--'}"/> 
+                            </apex:outputpanel> 
+                       </apex:pageblocksectionitem>                                               
+                                          
+                     <apex:inputfield value="{!Opportunity.Car_Title_in_Hand__c}"/>
+                                                                                    
+                     <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="Vehicle Model"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Opportunity.Vehicle_Model_BB__c}">
+                                    <apex:actionSupport event="onchange" rerender="vehicleinfo"/>                                
+                                </apex:inputfield>                                
+                                <apex:inputfield value="{!Opportunity.Vehicle_Model__c}" rendered="{!Opportunity.Vehicle_Year_BB__c =='--Other--'}"/>
+                                <apex:inputfield value="{!Opportunity.Vehicle_Model__c}" rendered="{!Opportunity.Vehicle_Make_BB__c =='--Other--'}"/>
+                                <apex:inputfield value="{!Opportunity.Vehicle_Model__c}" rendered="{!Opportunity.Vehicle_Model_BB__c =='--Other--'}"/> 
+                            </apex:outputpanel> 
+                       </apex:pageblocksectionitem>                            
+
+                     <apex:inputfield value="{!Opportunity.Making_Payments__c}"/>                     
+                     <apex:inputfield value="{!Opportunity.Vehicle_Mileage__c}"/>                                           
+                     <apex:inputfield value="{!Opportunity.How_Many_Payments_Made__c}"/>                     
+                     <apex:inputfield value="{!Opportunity.Estimate__c}"/>                                                                                                                                    
+                     <apex:inputfield value="{!Opportunity.Credit_Score__c}"/>                                
+                </apex:pageBlockSection> 
+                </apex:actionRegion>
+                 
+                <apex:pageblocksection columns="2" title="Product Options"> 
+                    <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Prod_Opt_Page_Section_Loan}" var="f">
+                        <apex:inputField value="{!Opportunity[f]}" />
+                    </apex:repeat>                     
+                 </apex:pageblockSection>    
+                  
+                 <apex:pageblocksection columns="2" title="Appointment"> 
+                    <apex:inputfield value="{!Opportunity.Store__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.Store__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Appointment_Date_Time__c}"/>  
+                    <apex:inputfield value="{!Opportunity.Store_Id__c}"/>
+                    <apex:inputfield value="{!Opportunity.Appointment_Email_Sent__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.Appointment_Email_Sent__c}" rendered="{!$Profile.Name !='System Administrator'}"/>
+                    <apex:inputfield value="{!Opportunity.Store_Email__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.Store_Email__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputCheckbox value="{!Opportunity.VA_acknowledged__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/>  
+                    <apex:inputfield value="{!Opportunity.Store_address__c}" rendered="{!$Profile.Name =='System Administrator'}"/>   
+                    <apex:outputfield value="{!Opportunity.Store_address__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                
+                 </apex:pageblockSection>   
+                  
+                 <apex:pageblocksection columns="2" title="Related Persons"> 
+                    <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Related_Pers_Page_Section_Loan}" var="f">
+                        <apex:inputField value="{!Opportunity[f]}" />
+                    </apex:repeat>               
+                 </apex:pageblockSection> 
+                  
+                 <apex:pageblocksection columns="2" title="Funding Information"> 
+                    <apex:inputfield value="{!Opportunity.Funded_Information__c}" style="width:250px" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:inputfield value="{!Opportunity.Loan_Number__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.Loan_Number__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Funded_Store__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/> 
+                    <apex:inputfield value="{!Opportunity.Loan_Amount__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.Loan_Amount__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                 
+                    <apex:inputfield value="{!Opportunity.Funded_Vehicle_Make__c}" rendered="{!$Profile.Name =='System Administrator'}" /> 
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/>   
+                    <apex:inputfield value="{!Opportunity.Loan_Received_Date__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.Loan_Received_Date__c}" rendered="{!$Profile.Name !='System Administrator'}"/>
+                    <apex:inputfield value="{!Opportunity.Funded_Vehicle_Model__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputtext value="" rendered="{!$Profile.Name =='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Funded_Vehicle_Year__c}" rendered="{!$Profile.Name =='System Administrator'}"/>               
+                 </apex:pageblockSection>                         
+
+                 <apex:pageblocksection columns="2" title="Additional Information"> 
+                    <apex:inputfield value="{!Opportunity.First_Contact_Attempt__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.First_Contact_Attempt_By__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Last_Disposition__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.Last_Disposition__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputCheckbox value="{!Opportunity.First_Contact_Made__c}" rendered="{!$Profile.Name =='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.Total_Contact_Attempts__c}" rendered="{!$Profile.Name !='System Administrator'}"/>  
+                    <apex:inputfield value="{!Opportunity.Last_Detail__c}" rendered="{!$Profile.Name ='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.Last_Detail__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.First_Contact_Attempt__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.First_Contact_Made__c}" rendered="{!$Profile.Name !='System Administrator'}" />                 
+                    <apex:inputfield value="{!Opportunity.Credit_Override__c}" rendered="{!$Profile.Name =='System Administrator'}" />  
+                    <apex:outputfield value="{!Opportunity.Credit_Override__c}" rendered="{!$Profile.Name !='System Administrator'}" />  
+                    <apex:inputfield value="{!Opportunity.Reassigned_to_Recovery__c}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.First_Contact_Attempt__c}" rendered="{!$Profile.Name !='System Administrator'}"/>
+                    <apex:outputtext value="" rendered="{!$Profile.Name !='System Administrator'}"/> 
+                    <apex:outputfield value="{!Opportunity.Reassigned_to_Recovery__c}" rendered="{!$Profile.Name !='System Administrator'}"/>               
+                 </apex:pageblockSection>          
+
+                 <apex:pageblocksection columns="1" title="Description Information"> 
+                    <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Desc_Info_Page_Section_Loan}" var="f">
+                        <apex:inputField value="{!Opportunity[f]}" />
+                    </apex:repeat>     
+                 </apex:pageblockSection> 
+                  
+                 <apex:pageblocksection columns="2" title="System Information"> 
+                    <apex:inputfield value="{!Opportunity.Lead_Created_Date__c}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Opportunity.Lead_Created_Date__c}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:inputfield value="{!Opportunity.Probability}" rendered="{!$Profile.Name =='System Administrator'}"/>
+                    <apex:outputfield value="{!Opportunity.Probability}" rendered="{!$Profile.Name !='System Administrator'}"/>                    
+                    <apex:outputtext value=""/>                    
+                    <apex:inputfield value="{!Opportunity.CloseDate}"/>                    
+                 </apex:pageblockSection>   
+                  
+            </apex:pageBlock>  
+                    
+    </apex:form> 
+
+</apex:page>

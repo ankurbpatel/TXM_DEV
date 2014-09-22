@@ -1,0 +1,41 @@
+<apex:page standardController="Opportunity" tabStyle="Task" extensions="taskpagectrl"> 
+        <apex:form > 
+        <apex:pageBlock mode="Edit" title="Task Edit" >
+            <apex:pageBlockButtons > 
+                 
+<apex:actionStatus id="Status1"> 
+    <apex:facet name="stop">  
+        <apex:commandButton action="{!update1}" value="Save" reRender="dummy" status="Status1" oncomplete="setTimeout(function() { window.location.replace('/{!Opportunity.Id}') }, 2000);"/>
+    </apex:facet> 
+    <apex:facet name="start"> 
+    <apex:outputPanel > 
+    <apex:image value="/img/loading32.gif" style="height: 15px;"/> 
+    <apex:commandButton value="Saving..." status="Status1" disabled="true"/> 
+    </apex:outputPanel> 
+    </apex:facet> 
+    </apex:actionStatus> 
+        <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="2" title="Task Information"> 
+                 <apex:inputField value="{!tsk.Disposition__c}"/>
+                 <apex:inputField value="{!tsk.OwnerId}"/>
+                 <apex:inputField value="{!tsk.Detail__c}"/>
+                 <apex:inputField value="{!tsk.WhoId}"/>
+                 <apex:inputField value="{!tsk.Call_Back_Time__c}"/>
+                 <apex:inputField value="{!tsk.Due__c}"/>
+            </apex:pageblockSection>
+            <apex:pageBlockSection columns="1" title="Additional Information"> 
+                 <apex:inputField value="{!tsk.Attempt__c}"/>
+                 <apex:inputField value="{!tsk.Description}" style="width:350px; height:50px"/> 
+            </apex:pageblockSection>
+            <apex:pageBlockSection columns="2" title="System Information"> 
+                 <apex:inputField value="{!tsk.whatid}"/>
+                 <apex:inputField value="{!tsk.ActivityDate}"/> 
+                 <apex:inputField value="{!tsk.Priority}"/>
+                 <apex:inputField value="{!tsk.Subject}"/> 
+                 <apex:inputField value="{!tsk.Status}"/>  
+            </apex:pageblockSection>
+        </apex:pageBlock>
+ 
+   </apex:form> 
+   </apex:page>

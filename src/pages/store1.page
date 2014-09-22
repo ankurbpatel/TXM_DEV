@@ -1,0 +1,797 @@
+<apex:page docType="html-5.0" showheader="false" applyHtmlTag="false" applyBodyTag="false">
+
+<apex:pageBlock title="SALES REPRESENTATIVE TOOL" > 
+    <style>
+                body .bPageBlock .pbBody .red .pbSubheader{
+                    background-color:#0060c0;
+                }
+                body .bPageBlock .pbBody .grey .pbSubheader{
+                    background-color:#c0c0c0;
+                }
+                body .bPageBlock .pbBody .grey .pbSubheader h3{
+                    color:#000;
+                }
+                
+                .table1 {width:95%;
+                margin-top:20px;
+                margin-left:40px;
+                font-size:12px;
+                border:outset;
+                float:center;
+                padding:5px;
+                 }
+                
+                .table1 th {color:#000;
+                vertical-align:middle; 
+                text-align:left;
+                border:1px; 
+                padding:5px;
+                }
+                
+                .table1 td {color:#000099;
+                vertical-align:middle; text-align:left; 
+                padding:5px;
+                }
+                
+                .table2 {width:95%;
+                margin-top:10px;
+                margin-left:40px;
+                font-size:12px;
+                border:outset;
+                table-layout: fixed;
+                padding:5px;
+                 }
+                
+                .table2 th {color:#000;
+                vertical-align:middle; text-align:center;
+                padding:5px;
+                }
+                
+                .table2 td {color:#000099;
+                vertical-align:middle; text-align:left;
+                word-wrap:break-word;
+                padding:5px;
+                }
+                
+                .divStyle {align: center; width:98%;}
+    </style>
+         
+
+    <script src="/soap/ajax/29.0/connection.js" type="text/javascript"></script>
+    <script src="/soap/ajax/29.0/apex.js" type="text/javascript"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>  
+   
+    <script>
+    var geocoder;
+    var map;  
+    var records;  
+    var selectedStoreId;
+    var stateSelected;
+     var add;
+    var storeCode;
+    var params = {};
+    var markers = [];
+    var srchMarker = new google.maps.Marker();
+    
+    function initialize() {
+    
+    /*document.getElementById("zipCode").value = getCookie("ZipCode");
+    document.getElementById("zipCode").value = getCookie("City");
+    document.getElementById("zipCode").value = getCookie("State");
+    if(getCookie("chkTitleMax") == "Yes")
+        document.getElementById('chkTitleMax').checked = true;
+    if(getCookie("chkTitleBucks") == "Yes")
+        document.getElementById('chkTitleBucks').checked = true;
+    if(getCookie("chkInstaLoan") == "Yes")
+        document.getElementById('chkInstaLoan').checked = true;*/
+
+    if (location.search) {
+        var parts = location.search.substring(1).split('&');
+    
+        for (var i = 0; i < parts.length; i++) {
+            var nv = parts[i].split('=');
+            if (!nv[0]) continue;
+            params[nv[0]] = nv[1] || true;
+        }
+    }
+    
+    var leadzipCode;
+                                                       
+    if(params.zipCode!= undefined)
+    leadzipCode = params.zipCode;
+    if(params.zipCode==''|| params.zipCode==true || params.zipCode==undefined)
+    leadzipCode = "75006";
+    
+                            
+    document.getElementById("zipCode").value = leadzipCode;
+                           
+                        
+    //if(params.lead == undefined)
+    //{
+    //document.getElementById('lblErrorMsg').innerHTML = "Lead not selected";
+    //document.getElementById('lblErrorMsg').style.display = "block";
+    //}
+
+    geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode( { 'address': leadzipCode }, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) { 
+    leadLocation =  results[0].geometry.location;        
+    
+    var mapOptions = {
+    zoom: 8,
+    center: leadLocation
+    }
+
+    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);    
+   
+    srchMarker = new google.maps.Marker({
+                                        map: map,
+                                        position: results[0].geometry.location
+                                    });
+                                } 
+                                //else {
+                                //        document.getElementById('lblErrorMsg').innerHTML = "Invalid Lead Zip Code" + status;
+                                //        document.getElementById('lblErrorMsg').style.display = "block";
+                                //}
+                            
+    });
+    codeAddress();                      
+    }
+
+   //To read parameters from URL string
+    function getURLParams(name){
+    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
+    var regexS = "[\\?&]"+name+"=([^&#]*)";  
+    var regex = new RegExp( regexS );  
+    var results = regex.exec( window.location.href ); 
+     if( results == null )    return "";  
+    else    return results[1];
+    }
+   
+    //To navigate and highlight the location entered in the zip code input
+    function codeAddress() {
+     for (var i = 0; i < markers.length; i++) {
+     markers[i].setMap(null);
+     }
+    srchMarker.setMap(null);
+    srchMarker = new google.maps.Marker();
+    markers = [];
+    document.getElementById('divStoreDetails').style.display = "none";
+    document.getElementById('divCustomerRequirments').style.display = "none";
+    document.getElementById('divProducts').style.display = "none"; 
+    var varZipCode = document.getElementById("zipCode").value;
+    var varCity = document.getElementById("city").value;
+    var varState = document.getElementById("state").value;
+    if(varCity == "City") varCity = "";
+    if(varState == "State") varState = "";
+    //var address = varZipCode+varCity+varState;
+     var address = varZipCode+", "+varCity+", "+varState;
+    
+    //setCookie("ZipCode",varZipCode,1);
+    //setCookie("City",varCity,1);
+    //setCookie("State",varState,1);
+
+    geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+    frmLocation =  results[0].geometry.location;
+    map.setCenter(results[0].geometry.location);  
+    nearestStores(results[0].geometry.location);  
+    }});   
+    }
+    
+    //get a cookie value
+    function getCookie(cname)
+    {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++)
+      {
+      var c = ca[i].trim();
+      if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+      }
+    return "";
+    }
+    
+    //set a cookie value
+    function setCookie(cname,cvalue,exdays)
+    {
+    var d = new Date();
+    d.setTime(d.getTime()+(exdays*24*60*60*1000));
+    var expires = "expires="+d.toGMTString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+    }  
+    
+    //make the first record as default selected
+    function defaultSelected()
+    {
+        if(document.getElementById("tblStores").rows.length !=0)
+        {
+            var firstrow = document.getElementById("tblStores").rows[1];
+            <!--firstrow.style.backgroundColor = '#dcfac9'; -->
+            showStoreDetails(firstrow);
+        }   
+    }
+    
+    //clear the highligting of previous store on choosing another store
+    function clearHighlightStores()
+    {
+        if(document.getElementById("tblStores").rows.length !=0)
+        {
+            var noOfRows = document.getElementById("tblStores").rows.length;
+            <!-- alert(noOfRows); -->
+            for(i=1;i<noOfRows;i++)
+            {
+                var row = document.getElementById("tblStores").rows[i];
+                row.style.backgroundColor = 'white';
+                row.style.fontWeight="400";
+            }
+        }         
+    }
+    
+    //Show all stores as markers in the map
+    function showAllMarkers(recs)
+      {
+        if(recs.length != 0)
+        {
+          
+          for(var i=0;i<recs.length;i++)
+          {
+            var myLatlng = new google.maps.LatLng(recs[i].Geolocation__Latitude__s, recs[i].Geolocation__Longitude__s);
+            var mapOptions = {
+              zoom: 16,
+              center: myLatlng
+            }                
+                var marker = new google.maps.Marker({
+                  position: myLatlng,
+                  map: map,
+                  title: recs[i].Name
+                });
+            markers.push(marker);
+          }
+        }
+      
+    }
+    
+    //Identify the stores whioch are not open to distinguish with different style
+    function identifyUnOpen()
+    {
+        var rows = document.getElementById("tblStores").rows;
+        var rowCount = rows.length;
+        <!-- alert(rowCount); -->
+        for(i=1; i<rowCount; i++)
+        {
+            var rowItem = document.getElementById("tblStores").rows[i];               
+            var storeStatus = document.getElementById("tblStores").rows[i].cells[5].innerHTML;
+            <!--  alert(storeStatus); -->
+            if(storeStatus != "Open")
+            {
+                document.getElementById("tblStores").rows[i].cells[2].style.color = '#FF0000';
+                document.getElementById("tblStores").rows[i].cells[2].style.fontStyle="italic";
+                document.getElementById("tblStores").rows[i].cells[3].style.color = '#FF0000';
+                document.getElementById("tblStores").rows[i].cells[3].style.fontStyle="italic";                
+                document.getElementById("tblStores").rows[i].cells[4].style.color = '#FF0000';
+                document.getElementById("tblStores").rows[i].cells[4].style.fontStyle="italic";
+                document.getElementById("tblStores").rows[i].cells[5].style.color = '#FF0000';
+                document.getElementById("tblStores").rows[i].cells[5].style.fontStyle="italic";                
+            }
+        } 
+        
+    }
+    
+    //show a particular store information on choosing it in store search results
+    function showStoreDetails(row)
+    {
+        if(row != undefined)
+        {
+        clearHighlightStores();
+        var x=row.cells;
+        selectedStoreId=x[1].innerHTML;
+        storeAddress=x[3].innerHTML;
+         var soqlStoreQuery = "SELECT Store_Description__c, Store_Phone_Number__c, Store_State__c, Store_Code__c, HoursW__c, HoursSa__c, HoursSu__c, Region_Mgr__c, Store_Mgr__c, General_Mgr__c, Email_Address__c, Bilingual__c  FROM Store__c WHERE Id="+"'"+selectedStoreId+"'";
+       <!-- alert(soqlStoreQuery ); -->
+        var result = sforce.connection.query(soqlStoreQuery);
+        var storeRecs = result.getArray("records");
+         stateSelected = checkForVal(storeRecs[0].Store_State__c);
+       <!-- alert(storeRecs); -->
+        storeCode = checkForVal(storeRecs[0].Store_Code__c);
+        document.getElementById("lblStoreName").innerHTML = checkForVal(x[2].innerHTML);
+        document.getElementById("lblStoreStatus").innerHTML = "Status: " + checkForVal(x[5].innerHTML);
+        document.getElementById("lblStoreAddress").innerHTML = "Address: " + checkForVal(storeAddress);
+        document.getElementById("lblStoreSM").innerHTML = "Store Manager: " + checkForVal(storeRecs[0].Store_Mgr__c);
+        document.getElementById("lblStoreRGM").innerHTML = "Region Manager: " + checkForVal(storeRecs[0].Region_Mgr__c);
+        document.getElementById("lblStoreGM").innerHTML = "General Manager: " + checkForVal(storeRecs[0].General_Mgr__c);
+        document.getElementById("lblStorePhone").innerHTML = "Phone: " + checkForVal(storeRecs[0].Store_Phone_Number__c);
+        document.getElementById("lblStoreEmail").innerHTML = "Email: " + checkForVal(storeRecs[0].Email_Address__c);
+        document.getElementById("lblHoursOfOperation").innerHTML = "Hours of Operation - Weekdays: " + checkForVal(storeRecs[0].HoursW__c);
+        document.getElementById("lblHoursOfOperationsa").innerHTML = "Hours of Operation - saturday: " + checkForVal(storeRecs[0].HoursSa__c);
+        document.getElementById("lblHoursOfOperationsu").innerHTML = "Hours of Operation - sunday: " + checkForVal(storeRecs[0].HoursSu__c);
+        document.getElementById("lblStoreDescription").innerHTML = "Store Description: " + checkForVal(storeRecs[0].Store_Description__c);
+        document.getElementById("lblBilingual").innerHTML = "Bilingual: " + checkForVal(storeRecs[0].Bilingual__c);
+        document.getElementById('divStoreDetails').style.display = "block";
+        row.style.backgroundColor = '#dcfac9';
+        row.style.fontWeight="900";  
+                
+        //Show Product and Customer details        
+        storeAddress = storeAddress.trim().split(',');
+       
+        var storeState = storeAddress[2];
+        var city=storeAddress[1];
+        var street=storeAddress[0];
+        var zip=storeAddress[3];
+        add=street+' '+city+' '+storeState+' '+zip;
+        storeState = findState(storeState);
+        var storeType= x[6].innerHTML;
+        
+         if(x[7].innerHTML != "" && x[8].innerHTML != "" && markers.length > 0)
+          {
+            var highLight= new google.maps.LatLng(x[7].innerHTML, x[8].innerHTML);
+          for(i=0;i<markers.length;i++)
+          {
+            if(markers[i].position.toString() == highLight.toString())
+            {
+              markers[i].setAnimation(google.maps.Animation.BOUNCE);
+            }
+            
+            else
+            {
+              markers[i].setAnimation(google.maps.Animation.DROP);
+            }
+          }
+        }
+        stateSelected=findState(stateSelected);
+        //SOQL query to consider only first record
+                var soqlQuery = "SELECT Acceptable_Titles__c, Loan_Amounts__c, Partial_Payment__c, Payment_Types__c, Proof_of_Residency__c, Cosigners_Co__c, Military__c, Power_of_Attorney__c, Product_Info__c, Proof_of_Income__c, Requirements__c, Third_Party_Verification__c, Unacceptable_Titles__c, Vehicles__c FROM Operations_Manual__c WHERE Name = '" + stateSelected + "' AND Brand_Type_of_Loan__c = '" + storeType + "' LIMIT 1";
+        //var soqlQuery = "SELECT Acceptable_Titles__c, Partial_Payment__c, Payment_Types__c, Cosigners_Co__c, Military__c, Power_of_Attorney__c, Brand_Type_of_Loan__c, Product_Info__c, Proof_of_Income__c, Requirements__c, Third_Party_Verification__c, Unacceptable_Titles__c, Vehicles__c FROM Operations_Manual__c WHERE Name = '" + storeState + "' AND Brand_Type_of_Loan__c = '" + storeType + "' LIMIT 1";
+
+         
+        var prodResult = sforce.connection.query(soqlQuery);
+        var result = sforce.connection.query(soqlQuery);
+        prodRcrds = prodResult.getArray("records");
+        if(prodRcrds.length != 0)
+        {
+        document.getElementById("divProductInfo").innerHTML = checkForVal(prodRcrds[0].Product_Info__c) + "<br></br>";        
+        document.getElementById("divLoanPayment").innerHTML = checkForVal(prodRcrds[0].Loan_Amounts__c) + "<br></br>";
+        document.getElementById("divPaymentType").innerHTML = checkForVal(prodRcrds[0].Payment_Types__c) + "<br></br>";
+        document.getElementById("divPartialPayment").innerHTML = checkForVal(prodRcrds[0].Partial_Payment__c) + "<br></br><br></br>";  
+        document.getElementById("divProofofResidency").innerHTML = checkForVal(prodRcrds[0].Proof_of_Residency__c) + "<br></br><br></br>";          
+        document.getElementById("divVehicles").innerHTML = checkForVal(prodRcrds[0].Vehicles__c) + "<br></br><br></br>";
+        document.getElementById('divProducts').style.display = "block"; 
+        document.getElementById("divRequirements").innerHTML = checkForVal(prodRcrds[0].Requirements__c) + "<br></br>";
+        document.getElementById("divAcceptableTitles").innerHTML = checkForVal(prodRcrds[0]. Acceptable_Titles__c) + "<br></br>";
+        document.getElementById("divUnacceptableTitles").innerHTML = checkForVal(prodRcrds[0].Unacceptable_Titles__c) + "<br></br>";
+        document.getElementById("divCosigners").innerHTML = checkForVal(prodRcrds[0].Cosigners_Co__c) + "<br></br>";
+        document.getElementById("divProofOfIncome").innerHTML = checkForVal(prodRcrds[0].Proof_of_Income__c) + "<br></br>";
+        document.getElementById("divMilitary").innerHTML = checkForVal(prodRcrds[0].Military__c) + "<br></br>";
+        document.getElementById("divPowerOfAttorney").innerHTML = checkForVal(prodRcrds[0].Power_of_Attorney__c) + "<br></br>";
+        document.getElementById("divThirdPartyVerify").innerHTML = checkForVal(prodRcrds[0].Third_Party_Verification__c) + "<br></br>";
+        document.getElementById('divCustomerRequirments').style.display = "block";
+        }}
+    }
+    
+    //change the color of row based on the mouse over and mouse out events
+    function ChangeColor(tableRow, highLight)
+    {
+        if (highLight)
+        {
+          tableRow.style.backgroundColor = '#dcfac9';
+        }
+        else
+        {
+          tableRow.style.backgroundColor = 'white';
+        }
+    }
+        
+    //Replace the value of any data with n/a if there is no value in it
+    function checkForVal(val) {
+        return val || 'n/a';
+    }
+    
+    //Find the nearest stores available with in 50 miles from given location 
+    function nearestStores(frmlocation){
+        <!-- alert(frmlocation); -->
+        frmlocation = frmlocation.toString();
+        sforce.connection.sessionId = "{!$Api.Session_ID}";
+            
+        var soqlQuery = "SELECT Id, Name, Store_City__c, Store_Street__c, District_Name__c, Store_State__c,Store_Zip_Code__c, Store_Status__c, Store_Type__c, Geolocation__Latitude__s, Geolocation__Longitude__s FROM Store__c WHERE ";
+            
+        var arrStoreTypes= new Array();
+        var i=0;
+        if (document.getElementById('chkTitleMax').checked){
+            arrStoreTypes[i] = "'" + document.getElementById('chkTitleMax').value + "'";
+            i=i+1;
+        }         
+              
+        if (document.getElementById('chkTitleBucks').checked){
+            arrStoreTypes[i] = "'" + document.getElementById('chkTitleBucks').value + "'";
+            i=i+1; 
+        }
+              
+        if (document.getElementById('chkInstaLoan').checked){
+            arrStoreTypes[i] = "'" + document.getElementById('chkInstaLoan').value + "'";
+            i=i+1;
+        }
+              
+            <!-- alert(arrStoreTypes.length); -->
+             
+        if(arrStoreTypes.length == 1)
+            soqlQuery  = soqlQuery + "Store_Type__c=" + arrStoreTypes[0] + " AND ";
+        if(arrStoreTypes.length == 2)
+            soqlQuery  = soqlQuery + "Store_Type__c IN " + "(" + arrStoreTypes[0] + "," +arrStoreTypes[1] + ")" + " AND ";
+        if(arrStoreTypes.length == 3)
+            soqlQuery  = soqlQuery + "Store_Type__c IN " + "(" + arrStoreTypes[0] + "," + arrStoreTypes[1] + "," + arrStoreTypes[2] + ")" + " AND ";
+              
+        soqlQuery = soqlQuery + "DISTANCE(Geolocation__c, GEOLOCATION"+frmlocation+", 'mi') < 50 ORDER BY DISTANCE(Geolocation__c, GEOLOCATION"+frmlocation+", 'mi')";
+              
+        <!--alert(soqlQuery); -->
+            
+        var result = sforce.connection.query(soqlQuery);
+        records = result.getArray("records");
+        if (records.length == 0) {
+                            document.getElementById('lblErrorMsg').innerHTML = "No stores found within 50miles";
+                            document.getElementById('lblErrorMsg').style.display = "block";
+                        }      
+                       else{ document.getElementById('lblErrorMsg').innerHTML = "";
+                            document.getElementById('lblErrorMsg').style.display = "block";}
+        var str = "<table class='table1' id='tblStores'>";
+        str += "<tr><th></th><th style='display:none;'>Id</th><th>Name</th><th>Address</th><th>Distance (miles)</th><th>Status</th><th>Brand</th></tr>";
+        for (var i = 0; i < records.length; i++) {
+        var brows = records[i];
+        var address = checkForVal(brows.Store_Street__c) + "," + checkForVal(brows.Store_City__c) + "," +  checkForVal(brows.Store_State__c) + "," + checkForVal(brows.Store_Zip_Code__c);  
+        str += "<tr onmouseover='ChangeColor(this, true);' onmouseout='ChangeColor(this, false);' onclick='showStoreDetails(this);'><td>" + (i+1) + "</td><td style='display:none;'>" + checkForVal(brows.Id) + "</td><td>"+ checkForVal(brows.Name) + "</td><td>" + address + "</td><td>" + calculateDistance(frmlocation,brows.Geolocation__Latitude__s, brows.Geolocation__Longitude__s) + "</td><td>" + checkForVal(brows.Store_Status__c) +"</td><td>" + checkForVal(brows.Store_Type__c) +"</td></tdr>" + "</td><td style='display:none;'>"+  checkForVal(brows.Geolocation__Latitude__s) +"</td></td>" + "</td><td style='display:none;'>" + checkForVal(brows.Geolocation__Longitude__s)+ "</td></tr>";
+        }
+        
+        str += "</table>";    
+        <!--alert(str);-->
+           
+        var tableContainer = document.getElementById("divNearestStores");
+        tableContainer.innerHTML =  str;
+        defaultSelected();
+        identifyUnOpen();  
+        document.getElementById('divNearestStores').style.display = "block";
+        showAllMarkers(records);    
+    }  
+    
+    
+    function isNumber(evt){
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    
+    //Calculate the distance between the search location to the stores
+    function calculateDistance(frmLoc,locLat,locLang){
+        frmLoc = frmLoc.replace("(","");
+        frmLoc = frmLoc.replace(")","");
+        frmLoc = frmLoc.trim().split(',');
+        var frmLat = parseFloat(frmLoc[0]);
+        var frmLon = parseFloat(frmLoc[1]);
+        var from = new google.maps.LatLng(frmLat,frmLon);
+        var to   = new google.maps.LatLng(locLat, locLang);
+        var dist = to.distanceFrom(from);
+        dist = (dist/1000)*0.621371;
+        return dist.toFixed(2)
+    }
+                
+    google.maps.LatLng.prototype.distanceFrom = function(latlng) {
+        var lat = [this.lat(), latlng.lat()]
+        var lng = [this.lng(), latlng.lng()]
+        var R = 6378137;
+        var dLat = (lat[1]-lat[0]) * Math.PI / 180;
+        var dLng = (lng[1]-lng[0]) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat[0] * Math.PI / 180 ) * Math.cos(lat[1] * Math.PI / 180 ) *
+        Math.sin(dLng/2) * Math.sin(dLng/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c;
+        return Math.round(d);
+    }       
+      
+    //Update the lead with choosen store
+    function chooseStore(id,code,addresss){
+           <!-- var isConfirm = confirm("The highlighted store has been selected"); -->
+            var isConfirm=true;
+            
+            if(isConfirm){
+                     
+                      var Lead = new sforce.SObject("Lead");
+                      Lead.id = params.lead;
+                      Lead.Store_Id__c = code;
+                      Lead.Store_Name__c = id;
+                     Lead.address__c = addresss;
+                      sforce.connection.update([Lead]);
+                      var result=sforce.connection.update([Lead]);
+                      alert(result);
+                      var winMain = window.opener;
+                      if (null == winMain) {
+                          winMain = window.parent.opener;
+                          }
+                      winMain.refreshLead();
+                      return this.parent.parent.window.close();
+                     }
+                else
+                return this.parent.parent.window.close();
+    }
+
+   
+                
+       /*function getState(zipcode) {
+            geocoder.geocode( { 'address': zipcode}, function (result, status) {
+                var state = "N/A";
+                for (var component in result[0]['address_components']) {
+                    for (var i in result[0]['address_components'][component]['types']) {
+                        if (result[0]['address_components'][component]['types'][i] == "administrative_area_level_1") {
+                            state = result[0]['address_components'][component]['short_name'];
+                            return state;
+                        }
+                    }
+                }
+            });
+        }*/
+        
+        
+        
+    //Find full form of the State to search product and customer requirements   
+    function findState(code){
+            switch (code)
+            {
+            case "AL":
+              return "Alabama";
+              break;
+            case "AK":
+              return "Alaska";
+              break;
+            case "AZ":
+              return "Arizona";
+              break;
+              case "AR":
+              return "Arkansas";
+              break;
+            case "CA":
+              return "California";
+              break;
+            case "CO":
+              return "Colorado";
+              break;
+            case "CT":
+              return "Connecticut";
+              break;
+            case "DC":
+              return "District of Columbia";
+              break;
+            case "DE":
+              return "Delaware";
+              break;
+            case "FL":
+              return "Florida";
+              break;
+            case "GA":
+              return "Georgia";
+              break;
+            case "HI":
+              return "Hawaii";
+              break;
+            case "IA":
+              return "Iowa";
+              break;
+            case "ID":
+              return "Idaho";
+              break;
+            case "IL":
+              return "Illinois";
+              break;
+            case "IN":
+              return "Indiana";
+              break;
+            case "KS":
+              return "Kansas";
+              break;
+             
+            case "MO":
+              return "Missouri";
+              break;
+             
+            case "GE":
+              return "Georgia";
+              break;
+            case "TX":
+              return "Texas";
+              break;
+            case "VA":
+              return "Virginia";
+              break;
+             case "SC":
+              return "South Carolina";
+              break;
+             case "MS":
+              return "Missisipi";
+              break;
+             case "NV":
+              return "Nevada";
+              break;
+             case "NM":
+              return "New Mexico";
+              break;
+             case "TN":
+              return "Tennessee";
+              break;
+             case "UT":
+              return "Utah";
+              break;
+             
+            }
+        }
+       
+    </script>
+
+            
+        <apex:pageBlockSection title="STORE SEARCH" collapsible="true" >
+            <body onload="initialize()">
+            <div>
+                <div style="float:left;margin-left:50px;margin-right:50px;margin-top:0px;text-align:center; width: 250px; border-style:outset">
+                    <b><center> FIND A STORE LOCATION </center> </b> <br/> <br/>
+                    <input  id="zipCode" maxlength="5" style="width:120px" type="textbox" name="Zip Code" placeholder="Zip Code" onKeydown="Javascript: if (event.keyCode==13) codeAddress();"></input> <br/> <br/>(OR)<br/><br/>
+                    <input id="city" style="width:80px; margin-right:20px" type="textbox" name="City" placeholder="City"></input>
+                    <select id="state" style="height:20px">
+                        <option value="State">State
+                        </option><option value="Alabama">Alabama
+                        </option><option value="Alaska">Alaska
+                        </option><option value="Arizona">Arizona
+                        </option><option value="Arkansas">Arkansas
+                        </option><option value="California">California
+                        </option><option value="Colorado">Colorado
+                        </option><option value="Connecticut">Connecticut
+                        </option><option value="Delaware">Delaware
+                        </option><option value="Florida">Florida
+                        </option><option value="Georgia">Georgia
+                        </option><option value="Hawaii">Hawaii
+                        </option><option value="Idaho">Idaho
+                        </option><option value="Illinois">Illinois
+                        </option><option value="Indiana">Indiana
+                        </option><option value="Iowa">Iowa
+                        </option><option value="Kansas">Kansas
+                        </option><option value="Kentucky">Kentucky
+                        </option><option value="Louisiana">Louisiana
+                        </option><option value="Maine">Maine
+                        </option><option value="Maryland">Maryland
+                        </option><option value="Massachusetts">Massachusetts
+                        </option><option value="Michigan">Michigan
+                        </option><option value="Minnesota">Minnesota
+                        </option><option value="Mississippi">Mississippi
+                        </option><option value="Missouri">Missouri
+                        </option><option value="Montana">Montana
+                        </option><option value="Nebraska">Nebraska
+                        </option><option value="Nevada">Nevada
+                        </option><option value="New Hampshire">New Hampshire
+                        </option><option value="New Jersey">New Jersey
+                        </option><option value="New Mexico">New Mexico
+                        </option><option value="New York">New York
+                        </option><option value="North Carolina">North Carolina
+                        </option><option value="North Dakota">North Dakota
+                        </option><option value="Ohio">Ohio
+                        </option><option value="Oklahoma">Oklahoma
+                        </option><option value="Oregon">Oregon
+                        </option><option value="Pennsylvania">Pennsylvania
+                        </option><option value="Rhode Island">Rhode Island
+                        </option><option value="South Carolina">South Carolina
+                        </option><option value="South Dakota">South Dakota
+                        </option><option value="Tennessee">Tennessee
+                        </option><option value="Texas">Texas
+                        </option><option value="Utah">Utah
+                        </option><option value="Vermont">Vermont
+                        </option><option value="Virginia">Virginia
+                        </option><option value="Washington">Washington
+                        </option><option value="West Virginia">West Virginia
+                        </option><option value="Wisconsin">Wisconsin
+                        </option><option value="Wyoming">Wyoming</option>
+                    </select><br/><br/>
+                    <b>Store Type</b> <br/><br/>
+                    <input type="checkbox" id="chkTitleMax" value="TitleMax" checked='true'>Title Max </input><input type="checkbox" id="chkTitleBucks" value="TitleBucks" checked='true'>Title Bucks </input><input type="checkbox" id="chkInstaLoan" value="InstaLoan" checked='true'>InstaLoan </input><br/><br/> 
+                    <b><center><input type="button" value="Go" onclick="codeAddress()"></input></center></b>
+                    <br/>
+                    <label id="lblErrorMsg" style="color:red; display:none; word-wrap:break-word;"></label>
+                    <br/>
+                </div>
+                <div id="map-canvas" style="margin-top:40px; margin-left:400px; width: 800px; height: 300px; border-style:outset" ></div><br/><br/><br/>
+            </div>
+            </body>    
+        </apex:pageBlockSection>              
+
+        <apex:pageBlockSection title="STORE LOCATIONS" collapsible="true" columns="1" >
+            <div class='divStyle' style="overflow-y:scroll; height:200px; display:none;" id="divNearestStores"></div><br></br>
+            <hr align="center" width="90%"></hr><br></br>
+            <div id="divStoreDetails" style="display:none;" class='divStyle'>
+            <table class="table2">
+            <tr>              
+                <td colspan="2">
+                 <center><font size="5"><h3 style="text-decoration:underline"><label id="lblStoreName"></label></h3></font></center>
+                </td>
+            </tr>
+            <tr>              
+                <td colspan="2">
+                 <center><font size="3" color="red"><label id="lblStoreStatus"></label></font></center>
+                </td>
+            </tr>
+            <tr>              
+                <td>
+                 <label id="lblStoreAddress"></label>
+                </td>
+                <td>
+                 <label id="lblStoreSM"></label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                 <label id="lblStoreRGM"></label>
+                </td>
+                <td>
+                 <label id="lblStoreGM"></label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                 <label id="lblStorePhone"></label>
+                </td>
+                <td>
+                 <label id="lblStoreEmail"></label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                 <label id="lblHoursOfOperation"></label>
+                </td>
+                <td>
+                 <label id="lblBilingual"></label><br></br>
+                </td>
+            </tr>
+            <tr>
+            <td>
+                 <label id="lblHoursOfOperationsa"></label>
+                </td>
+                <td>
+                 <label id="lblHoursOfOperationsu"></label><br></br>
+                </td>
+            </tr>
+            <tr>
+               <td>
+                 <label id="lblStoreDescription" style="text-align: right" display="inline-block"></label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b><center><input type="button" value="Select & Close" onclick="chooseStore(selectedStoreId,storeCode,add);"></input></center></b><br></br>
+                </td>
+            </tr>
+            </table>            
+            </div> 
+        </apex:pageBlockSection>
+            
+        <apex:pageBlockSection title="PRODUCTS" collapsible="true" columns="1">
+            <br></br><br></br>           
+            <div id="divProducts" style="display:none;" class='divStyle'><b>LOAN PAYMENT</b><br></br>
+             <div id="divLoanPayment" class='divStyle'></div><b>PAYMENT TYPE</b><br></br>
+              <div id="divPaymentType" class='divStyle'></div><b>PRODUCT INFO</b><br></br>
+            <div id="divProductInfo" class='divStyle'></div><b>VEHICLES</b><br></br>
+            <div id="divVehicles" class='divStyle'></div>
+            </div>        
+        </apex:pageBlockSection> 
+          
+        <apex:pageBlockSection title="CUSTOMER REQUIREMENTS" collapsible="true" columns="1">
+            <br></br><br></br>
+            <div id="divCustomerRequirments" style="display:none;" class='divStyle'><b>REQUIREMENTS</b><br></br>
+            <div id="divRequirements" class='divStyle'></div><b>ACCEPTABLE TITLES</b><br></br>
+            <div id="divAcceptableTitles" class='divStyle'></div><b>UNACCEPTABLE TITLES</b><br></br>
+            <div id="divUnacceptableTitles" class='divStyle'></div><b>COSIGNERS / CO-OWNERS</b><br></br>
+            <div id="divCosigners" class='divStyle'></div><b>PROOF OF INCOME</b><br></br>
+            <div id="divProofOfIncome" class='divStyle'></div><b>MILITARY</b><br></br>
+            <div id="divMilitary" class='divStyle'></div><b>POWER OF ATTORNEY</b><br></br>
+            <div id="divPowerOfAttorney" class='divStyle'></div><b>THIRD PARTY VERIFICATION</b><br></br>
+            <div id="divPartialPayment" class='divStyle'></div><b>PARTIAL PAYMENT</b><br></br>
+            <div id="divProofofResidency" class='divStyle'></div><b>PROOF OF RESIDENCY</b><br></br>
+            <div id="divThirdPartyVerify" class='divStyle'></div><br></br>
+            </div>        
+        </apex:pageBlockSection>
+        
+    </apex:pageBlock>                         
+</apex:page>

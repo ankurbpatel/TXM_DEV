@@ -1,0 +1,3 @@
+<apex:page standardController="Lead_Assignment_Setting__c" extensions="calculateCapacityController" action="{!calculate}" >
+   
+</apex:page>

@@ -1,0 +1,20 @@
+<apex:page standardcontroller="Promise_to_Pay__c">
+
+<apex:form >
+        <apex:pageBlock title="New Promise to Pay">
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="1">
+                <apex:inputField value="{!Promise_to_Pay__c.Start_Date__c}"/>
+                <apex:inputField value="{!Promise_to_Pay__c.Payment__c}"/>
+                <apex:inputField value="{!Promise_to_Pay__c.Schedule_Type__c}"/>            
+                <apex:inputField value="{!Promise_to_Pay__c.Installment_Period__c}"/> 
+                <apex:inputField value="{!Promise_to_Pay__c.Number_of_Payments__c}"/> 
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

@@ -1,0 +1,70 @@
+<apex:page controller="TaskListController" tabStyle="worklist__tab">
+    <apex:form >
+    <apex:pageBlock >  
+        <apex:selectList id="worklist" value="{!string}" size="1" style="font-weight:800">
+            <b><apex:selectOption itemValue="worklist" itemLabel="My Worklist" /></b>
+        </apex:selectList> <br/>
+      </apex:pageBlock>
+      
+     <apex:pageBlock >  
+       <!--  <apex:commandButton value="New Task" onclick="window.open('/00T/e?retURL=https%3A%2F%2Fc.cs16.visual.force.com%2Fapex%2FTasklist%3Fsfdc.tabName%3D01ri0000000Kisz%26core.apexpages.devmode.url%3D1');"/>
+         <apex:commandButton value="New Event" onclick="window.open('/00U/e?retURL=https%3A%2F%2Fc.cs16.visual.force.com%2Fapex%2FTasklist%3Fsfdc.tabName%3D01ri0000000Kisz%26core.apexpages.devmode.url%3D1');"/>--->
+          <apex:commandButton value="Refresh" action="{!refreshpage}" reRender="myPanel,page"/>
+
+         <apex:outputPanel id="myPanel" layout="block" style="overflow:auto;width:1400px;">
+             <apex:pageBlockSection >
+               <apex:outputPanel style="height:500px;" layout="block"> 
+                <apex:pageBlockTable value="{!Tasks}" var="t" style="overflow:auto;width:1400px;"   >
+                    <apex:column headerValue="Action">
+                       <apex:outputlink value="/{!t.id}/e?retURL=https://c.na15.visual.force.com/apex/Tasklist?sfdc.tabName=01ri0000000Kisz" style="color:#006699" >Edit</apex:outputlink>
+                    </apex:column>
+                    <!-- <apex:column headerValue="Name" value="{!t.Lead_Loan__c}" style="color:blue"/>-->
+                     <apex:column headerValue="Name">
+                         <apex:outputLink value="{!t.Lead_Loan_URL__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}" >{!t.Lead_Opportunity_Name__c}</apex:outputLink>
+                     </apex:column>
+                     <!--<apex:column value="{!t.Worklist_Priority__c}"/>-->
+                    <apex:column value="{!t.Lead_Id__c}" width="90px" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>
+                    <!---<apex:column value="{!t.Subject__c}" width="90px"/>--->
+                    <apex:column value="{!t.Lead_Opportunity_Status__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}" />
+                    <!--<apex:column value="{!t.Owner_Viewed__c}"  width="150px" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>
+                    <apex:column value="{!t.Owner_Viewed_Time__c}"  width="150px" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>  -->                   
+                    <apex:column value="{!t.store_chosen__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}" rendered="{!$Profile.Name !='TMX Store Agent'}" />
+                     <apex:column value="{!t.Store_Phone__c}" width="115px" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}" rendered="{!$Profile.Name !='TMX Store Agent'}" />
+                    <apex:column headerValue="Created Date" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}" >
+                     <apex:outputText value="{0,date,MM/dd/yyyy}">
+                           <apex:param value="{!t.createdDate}" />
+                       </apex:outputText>
+                    </apex:column> 
+                    <apex:column value="{!t.Time_zone__c}" width="50px" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}" rendered="{!$Profile.Name !='TMX Store Agent'}" />   
+                    <apex:column value="{!t.Due__c}"  width="150px" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>                   
+                    <apex:column value="{!t.Lead_Last_Disposition__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>
+                    <apex:column value="{!t.Last_Detail__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>
+                    <!---<apex:column value="{!t.Detail__c}"/>-->
+                    <!-- Hide Lead Source and Product Requested columns -- 07/03/2014
+                    <apex:column value="{!t.Lead_Source__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/>
+                    <apex:column value="{!t.Product_Requested__c}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/> --> 
+                    <apex:column value="{!t.Owner.Name}" style="{!if(t.Restricted_Zip__c==true,'color:blue','')}"/> 
+               </apex:pageBlockTable> 
+                  </apex:outputPanel>
+            </apex:pageBlockSection><br/>
+         </apex:outputpanel>    
+           
+         <!--- <apex:actionFunction action="{!refreshGrid}" name="queryByPage" reRender="myPanel,myButtons" >
+            <apex:param name="firstParam" assignTo="{!selectedPage}" value="" />
+         </apex:actionFunction>
+         <apex:dynamicComponent componentValue="{!myCommandButtons}" />-->  
+               
+        <apex:outputpanel id="page">
+            <apex:pageMessages id="theMessages" />
+            <div>
+               {!recordNo}-{!recordNoLast} of {!total_size}
+            </div>
+            <div style="text-align:right">
+                  Page {!currentPage} of {!totalPages}
+            </div>
+            <center> <apex:commandButton value="Previous" action="{!Previous}" disabled="{!disablePrevious}" reRender="myPanel,page"/>
+            <apex:commandButton value="Next" action="{!Next}" disabled="{!DisableNext}" reRender="myPanel,page"/> </center>
+        </apex:outputPanel>
+      </apex:pageBlock>
+   </apex:form>
+</apex:page>

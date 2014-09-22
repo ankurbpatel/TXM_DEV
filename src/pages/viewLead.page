@@ -1,0 +1,19 @@
+<apex:page standardController="Lead" showHeader="true" tabStyle="lead" action="{!oppPage}" extensions="viewLeadController" >
+  
+    <script> 
+        
+        if({!userProfile=='TMX Store Agent'} && {!lead.Owner_Profile__c!='TMX Store Agent'}  ){
+             alert('This lead has been reassigned to a Contact Center Agent due to excessive inactivity and Time to Respond limitation. No further updates to the lead will be accepted for this user. '); 
+             window.parent.location.href="/apex/Tasklist";
+        }
+        if({!userProfile=='TMX Store Agent'} && {!lead.Owner_Profile__c=='TMX Store Agent'} && {!mydtstring!=''}){
+             alert('Owner last viewed at {!mydtstring}'); 
+        }
+         function refreshLead() 
+         {   
+           window.parent.location.href='/{!lead.id}'; 
+        }           
+
+    </script>
+    <apex:detail relatedList="true" title="true"/>
+</apex:page>

@@ -1,0 +1,54 @@
+<apex:page standardController="Lead" > 
+ 
+    <apex:form >
+    
+        <apex:sectionHeader title="Lead Edit" subtitle="{!if(Lead.Id==null,'New Lead',Lead.Name)}" />   
+            
+            <apex:pageBlock title="Lead Edit" mode="edit">
+                 <apex:pageBlockButtons >
+                     <apex:commandButton action="{!Save}" value="Save" />  
+                     <apex:commandButton action="{!Cancel}" value="Cancel" />                                                                                            
+                 </apex:pageBlockButtons>
+            
+                 <apex:pagemessages /> 
+            
+                <apex:pageblocksection columns="2" title="Lead Information"> 
+                    <apex:outputfield value="{!Lead.OwnerID}"/>                
+                    <apex:inputfield value="{!Lead.Status}" rendered="{!$Profile.Name =='System Administrator'}"/>  
+                    <apex:outputfield value="{!Lead.Status}" rendered="{!$Profile.Name !='System Administrator'}" />                      
+                    <apex:outputtext value=""/>  
+                    <apex:inputfield value="{!Lead.StatusDetails__c}" rendered="{!$Profile.Name =='System Administrator'}"/>                  
+                    <apex:outputfield value="{!Lead.StatusDetails__c}" rendered="{!$Profile.Name !='System Administrator'}"/>  
+                </apex:pageblockSection>     
+                      
+                <apex:pageblockSection columns="2" Title="Customer Information">                                   
+                    <apex:pageblocksectionitem > 
+                        <apex:outputlabel value="{!$ObjectType.Lead.Fields.FirstName.label}"/>
+                            <apex:outputpanel > 
+                                <apex:inputfield value="{!Lead.Salutation}"/>
+                                <apex:inputfield value="{!Lead.FirstName}"/> 
+                            </apex:outputpanel> 
+                    </apex:pageblocksectionitem> 
+                    
+                    <apex:inputfield value="{!Lead.Street}" style="width: 150px"/>
+                    <apex:inputfield value="{!Lead.LastName}" style="width: 225px"/>
+                    <apex:inputfield value="{!Lead.City}"/>
+                    <apex:inputfield value="{!Lead.Email}"/>
+                    <apex:inputfield value="{!Lead.State}"/>
+                    <apex:inputfield value="{!Lead.MobilePhone}" required="true"/>
+                    <apex:inputfield value="{!Lead.PostalCode}"/>
+                    <apex:inputfield value="{!Lead.Phone}"/>
+                    <apex:inputfield value="{!Lead.Country}"/> 
+                    <apex:inputfield value="{!Lead.Alternate_Phone__c}"/> 
+                    <apex:outputtext value=""/> 
+                    <apex:outputtext value=""/>                                  
+                    <apex:inputfield value="{!Lead.Product_Requested__c}" required="true"/>   
+                    <apex:outputtext value=""/> 
+                    <apex:inputfield value="{!Lead.Brand_Requested__c}" required="true"/>                             
+                 </apex:pageblockSection>                                                  
+                                   
+            </apex:pageBlock>  
+                    
+    </apex:form> 
+
+</apex:page>
